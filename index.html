@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jeu de combat mobile</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    background: #111;
+    color: white;
+    text-align: center;
+}
+
+#arena {
+    position: relative;
+    width: 100%;
+    height: 250px;
+    background: #333;
+    overflow: hidden;
+}
+
+.fighter {
+    position: absolute;
+    bottom: 20px;
+    width: 60px;
+    height: 100px;
+}
+
+#player {
+    left: 30px;
+    background: dodgerblue;
+}
+
+#enemy {
+    right: 30px;
+    background: crimson;
+}
+
+.bar {
+    width: 90%;
+    height: 20px;
+    border: 2px solid white;
+    margin: 10px auto;
+}
+
+.life {
+    height: 100%;
+    background: lime;
+}
+
+#controls button {
+    width: 30%;
+    padding: 15px;
+    font-size: 18px;
+    margin: 5px;
+    border-radius: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>🥊 Combat Mobile</h2>
+
+<div class="bar"><div id="playerLife" class="life"></div></div>
+<div class="bar"><div id="enemyLife" class="life" style="background:orange"></div></div>
+
+<div id="arena">
+    <div id="player" class="fighter"></div>
+    <div id="enemy" class="fighter"></div>
+</div>
+
+<div id="controls">
+    <button ontouchstart="move(-20)">⬅️</button>
+    <button ontouchstart="attack()">👊</button>
+    <button ontouchstart="move(20)">➡️</button>
+</div>
+
+<h3 id="result"></h3>
+
+<script>
+let playerX = 30;
+let enemyX = window.innerWidth - 90;
+let playerHP = 100;
+let enemyHP = 100;
+let gameOver = false;
+
+const player = document.getElementById("player");
+const enemy = document.getElementById("enemy");
+
+function update() {
+    player.style.left = playerX + "px";
+    enemy.style.left = enemyX + "px";
+    document.getElementById("playerLife").style.width = playerHP + "%";
+    document.getElementById("enemyLife").style.width = enemyHP + "%";
+}
+
+function move(dx) {
+    if (gameOver) return;
+    playerX += dx;
+    if (playerX < 0) playerX = 0;
+    if (playerX > window.innerWidth - 60) playerX = window.innerWidth - 60;
+    update();
+}
+
+function attack() {
+    if (gameOver) return;
+    if (Math.abs(playerX - enemyX) < 80) {
+        enemyHP -= 15;
+        enemy.style.opacity = 0.5;
+        setTimeout(() => enemy.style.opacity = 1, 100);
+        checkWin();
+        update();
+    }
+}
+
+function enemyAI() {
+    if (gameOver) return;
+    if (enemyX > playerX) enemyX -= 10;
+    else enemyX += 10;
+
+    if (Math.abs(playerX - enemyX) < 80) {
+        playerHP -= 10;
+        player.style.opacity = 0.5;
+        setTimeout(() => player.style.opacity = 1, 100);
+        checkWin();
+    }
+    update();
+}
+
+function checkWin() {
+    if (playerHP <= 0) {
+        document.getElementById("result").innerText = "💀 Perdu";
+        gameOver = true;
+    }
+    if (enemyHP <= 0) {
+        document.getElementById("result").innerText = "🏆 Gagné !";
+        gameOver = true;
+    }
+}
+
+setInterval(enemyAI, 1200);
+update();
+</script>
+
+</body>
+  </html>
